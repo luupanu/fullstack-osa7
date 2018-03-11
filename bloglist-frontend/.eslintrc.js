@@ -52,6 +52,8 @@ module.exports = {
         "test": true,
         "expect": true,
         "describe": true,
-        "it": true
+        "it": true,
+        "beforeEach": true,
+        "jest": true
     }
 };
