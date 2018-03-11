@@ -1,6 +1,6 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import SipleBlog from './SimpleBlog'
+import SimpleBlog from './SimpleBlog'
 
 describe.only('<SimpleBlog />', () => {
   const blog = {
@@ -10,7 +10,7 @@ describe.only('<SimpleBlog />', () => {
   }
 
   it('renders title, author and likes', () => {
-    const blogComponent = shallow(<SipleBlog blog={blog} />)
+    const blogComponent = shallow(<SimpleBlog blog={blog} />)
 
     expect(blogComponent.text()).toContain(blog.title)
     expect(blogComponent.text()).toContain(blog.author)
@@ -19,12 +19,12 @@ describe.only('<SimpleBlog />', () => {
 
   it('calls onClick handler', () => {
     const onClick = jest.fn()
-    const blogComponent = shallow(<SipleBlog blog={blog} onClick={onClick} />)
+    const blogComponent = shallow(<SimpleBlog blog={blog} onClick={onClick} />)
 
     const button = blogComponent.find('button')
     button.simulate('click')
     button.simulate('click')
 
     expect(onClick.mock.calls.length).toBe(2)
-  })  
+  })
 })
