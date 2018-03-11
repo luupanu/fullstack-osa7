@@ -6,6 +6,9 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import { connect } from 'react-redux'
+import { notify } from './reducers/notificationReducer'
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -13,7 +16,7 @@ class App extends React.Component {
       blogs: [],
       user: null,
       username: '',
-      password: '', 
+      password: '',
       title: '',
       author: '',
       url: '',
@@ -31,23 +34,14 @@ class App extends React.Component {
       this.setState({ user })
       blogService.setToken(user.token)
     }
-  } 
+  }
 
-  notify = (message, type = 'info') => {
-    this.setState({
-      notification: {
-        message, type
-      }
-    })
-    setTimeout(() => {
-      this.setState({
-        notification: null
-      })     
-    }, 10000)
+  notify = (message, kind = 'info') => {
+    this.props.notify(message, kind)
   }
 
   like = (id) => async () => {
-    const liked = this.state.blogs.find(b=>b._id===id)
+    const liked = this.state.blogs.find(b => b._id===id)
     const updated = { ...liked, likes: liked.likes + 1 }
     await blogService.update(id, updated)
     this.notify(`you liked '${updated.title}' by ${updated.author}`)
@@ -66,7 +60,7 @@ class App extends React.Component {
     await blogService.remove(id)
     this.notify(`blog '${deleted.title}' by ${deleted.author} removed`)
     this.setState({
-      blogs: this.state.blogs.filter(b=>b._id!==id)
+      blogs: this.state.blogs.filter(b => b._id!==id)
     })
   }
 
@@ -77,12 +71,12 @@ class App extends React.Component {
       author: this.state.author,
       url: this.state.url,
     }
-    
-    const result = await blogService.create(blog) 
+
+    const result = await blogService.create(blog)
     this.notify(`blog '${blog.title}' by ${blog.author} added`)
-    this.setState({ 
-      title: '', 
-      url: '', 
+    this.setState({
+      title: '',
+      url: '',
       author: '',
       blogs: this.state.blogs.concat(result)
     })
@@ -155,12 +149,12 @@ class App extends React.Component {
 
     return (
       <div>
-        <Notification notification={this.state.notification} />
+        <Notification/>
 
         {this.state.user.name} logged in <button onClick={this.logout}>logout</button>
 
         <Togglable buttonLabel='uusi blogi'>
-          <BlogForm 
+          <BlogForm
             handleChange={this.handleLoginChange}
             title={this.state.title}
             author={this.state.author}
@@ -170,18 +164,21 @@ class App extends React.Component {
         </Togglable>
 
         <h2>blogs</h2>
-        {blogsInOrder.map(blog => 
-          <Blog 
-            key={blog._id} 
-            blog={blog} 
+        {blogsInOrder.map(blog =>
+          <Blog
+            key={blog._id}
+            blog={blog}
             like={this.like(blog._id)}
             remove={this.remove(blog._id)}
             deletable={blog.user === undefined || blog.user.username === this.state.user.username}
           />
         )}
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default connect(
+  null,
+  { notify }
+)(App)
